@@ -1,0 +1,23 @@
+html {
+  height: 100%;
+  width: 100%;
+  background-color: lightblue;
+}
+h1,h2{
+  text-align: center;
+  color:purple;
+}
+
+canvas{
+  border:1px solid black;
+  margin:auto;
+  display: block;
+}
+
+button{
+  text-align: center;
+  display:block;
+  margin:auto;
+  margin-top: 5px;
+  padding:20px;
+}
