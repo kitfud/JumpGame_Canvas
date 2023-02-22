@@ -2,6 +2,7 @@ var canvas = document.getElementById("myCanvas")
 var ctx = canvas.getContext('2d')
 
 var playAgain = document.getElementById("playAgain")
+var title = document.getElementById("title")
 console.log(playAgain)
 playAgain.style.display = "none"
 
@@ -10,6 +11,75 @@ var audio = new Audio('littleidea.mp3')
 // canvas.onmousemove= function(e){
 //   console.log(e.offsetX,e.offsetY)
 // }
+
+
+    // More API functions here:
+    // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+
+    // the link to your model provided by Teachable Machine export panel
+      // the link to your model provided by Teachable Machine export panel
+    const URL = "https://teachablemachine.withgoogle.com/models/cA1eQXQiw/";
+
+    let model, webcam, labelContainer, maxPredictions;
+
+    var chinUpVal; 
+
+    let container = document.getElementsByClassName('container')
+ let teachableMachineText = document.getElementById("teachMachine")
+
+    container[0].style.display="none"
+
+    // Load the image model and setup the webcam
+    async function init() {
+
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+
+        // load the model and metadata
+        // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+        // or files from your local hard drive
+        // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+
+        // Convenience function to setup a webcam
+        const flip = true; // whether to flip the webcam
+        webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
+        await webcam.setup(); // request access to the webcam
+        await webcam.play();
+        window.requestAnimationFrame(loop);
+
+      container[0].style.display="flex"
+      teachableMachineText.style.display="none"
+      title.innerHTML="Rectangle Jump!"
+        // append elements to the DOM
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
+        labelContainer = document.getElementById("label-container");
+        for (let i = 0; i < maxPredictions; i++) { // and class labels
+            labelContainer.appendChild(document.createElement("div"));
+        }
+
+    }
+
+    async function loop() {
+        webcam.update(); // update the webcam frame
+        await predict();
+        window.requestAnimationFrame(loop);
+    }
+
+    // run the webcam image through the image model
+    async function predict() {
+        // predict can take in an image, video or canvas html element
+        const prediction = await model.predict(webcam.canvas);
+      chinUpVal = prediction[0].probability.toFixed(2)
+        for (let i = 0; i < maxPredictions; i++) {
+            const classPrediction =
+                prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+            labelContainer.childNodes[i].innerHTML = classPrediction;
+        }
+    }
+
+
 
 function drawGround(){
 ctx.fillStyle="green"
@@ -21,25 +91,36 @@ ctx.stroke()
 var spacePressed = false
 var canJump = true 
 
-function keyUpHandler(e){
-  if(e.keyCode==32){
-    spacePressed = false   
-  }
-}
-
-
-function keyDownHandler(e){
-  if(e.keyCode==32){
-    audio.play()
+function detectChin(){
+  if(chinUpVal>=0.80){
     if(canJump){
-    canJump = false
-    spacePressed=true
+      canJump=false
+      spacePressed=true
     }
   }
+  else{
+    spacePressed=false
+  }
 }
+// function keyUpHandler(e){
+//   if(e.keyCode==32){
+//     spacePressed = false   
+//   }
+// }
 
-document.addEventListener('keydown',keyDownHandler,false)
-document.addEventListener('keyup',keyUpHandler,false)
+
+// function keyDownHandler(e){
+//   if(e.keyCode==32){
+//     audio.play()
+//     if(canJump){
+//     canJump = false
+//     spacePressed=true
+//     }
+//   }
+// }
+
+// document.addEventListener('keydown',keyDownHandler,false)
+// document.addEventListener('keyup',keyUpHandler,false)
 
 var gravity= 0.3
 var score= 0
@@ -149,12 +230,30 @@ function resetGame(){
   score=0
   gameOver=false
   obstacle.x = 261
+  obstacle.velocity=3
   playAgain.style.display="none"
 }
 
 var gameOver = false
+
+function endGame(){
+      audio.pause()
+    ctx.clearRect(0,0,canvas.width,canvas.height)
+    ctx.fillStyle="black"
+    ctx.fillRect(0,0,canvas.width,canvas.height)
+    ctx.fillStyle = "white"
+    ctx.font = "20px Arial"
+    ctx.fillText("Game Over",100,100)
+    ctx.fillText(`Score: ${score}`,100,150)
+    playAgain.style.display="block"
+}
+
 function game(){
+  //console.log("chin",chinUpVal)
+  
   if(!gameOver){
+  detectChin()
+  console.log("jump",spacePressed)
   ctx.clearRect(0,0,canvas.width,canvas.height)
       ctx.fillStyle="black"
     ctx.fillRect(0,0,canvas.width,canvas.height)
@@ -165,16 +264,9 @@ function game(){
   boxCollision(player,obstacle)
   }
   else{
-    audio.pause()
-    ctx.clearRect(0,0,canvas.width,canvas.height)
-    ctx.fillStyle="black"
-    ctx.fillRect(0,0,canvas.width,canvas.height)
-    ctx.fillStyle = "purple"
-    ctx.font = "20px Arial"
-    ctx.fillText("Game Over",100,100)
-    ctx.fillText(`Score: ${score}`,100,150)
-    playAgain.style.display="block"
+  endGame()
   }
 }
 
 setInterval(game,50)
+

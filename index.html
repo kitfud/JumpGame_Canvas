@@ -6,16 +6,42 @@
   <meta name="viewport" content="width=device-width">
   <title>replit</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 </head>
 
 <body>
-  <h1>Rectangle Jump!</h1>
-  <h2>Press Space Bar to Leap</h2>
+
+
+
+ 
+       <h1 id="title">Teachable Machine Image Model</h1>
+
+  <div id="teachMachine"> 
+<button type="button" onclick="init()">Start</button>
+  </div>
+
+
+
+  <div class="container">
+
+    
+<div class="flexItem">
+<div id="webcam-container"></div>
+<div id="label-container"></div>
+    </div>
+
+  <div class="flexItem">
+  <h2>Chin up to Leap</h2>
   <canvas id="myCanvas" width=300 height=300></canvas>
-
   <button onclick=resetGame() id="playAgain">Play Again</button>
-  <script src="script.js"></script>
+  </div>
 
+    
+  </div>
+
+  <script src="script.js"></script>
+<script src="TeachableMachine.js"></script>
 </body>
 
 </html>

@@ -20,4 +20,21 @@ button{
   margin:auto;
   margin-top: 5px;
   padding:20px;
+  border-radius: 8px;
+}
+
+.container{
+  display:flex;
+  align-items: center;
+  margin:auto;
+  justify-content: space-between;
+  max-width: 500px;
+}
+
+#webcam-container{
+  padding:10px 10px 10px 10px;
+}
+
+div{
+  text-align: center;
 }
